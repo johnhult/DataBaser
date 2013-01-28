@@ -1,0 +1,57 @@
+Departments(_name_)
+Employees(_name_)
+WorksAt(_department_, _employee_)
+	department -> Departments.name
+	employee -> Employees.name
+StudyProgrammes(_name_)
+Hosts(_studyProgramme_, _department_)
+	studyProgramme -> StudyProgrammes.name
+	department -> Departments.name
+Branches(_name_, _studyProgramme_)
+	studyProgramme -> StudyProgrammes.name
+Students(_id_, name, studyProgramme)
+	studyProgramme -> StudyProgrammes.name
+MastersAt(_student_, _branch_)
+	student -> Students.id
+	branch -> Branches.name
+Courses(_name_, credits, department)
+	department -> Departments.name
+SeminarCourses(_course_)
+	course -> Courses.name
+MathematicalCourses(_course_)
+	course -> Courses.name
+ResearchCourses(_course_)
+	course -> Courses.name
+GivenCourses(_course_)
+	course -> Courses.name
+RestrictedCourses(_course_, #maxStudents)
+	course -> Courses.name
+WaitingLists(_restrictedCourse_)
+	restrictedCourse -> RestrictedCourses.course
+WaitsIn(_waitingList_, _student_)
+	waitingList -> WaitingLists.restrictedCourse
+	student -> Students.id
+Registered(_student_, _givenCourse_, date)
+	student -> Students.id
+	givenCourse -> GivenCourses.course
+Passed(_student_, _course_, grade)
+	student -> Students.id
+	course -> Courses.name
+Require(_course_, _requiredCourse_)
+	course -> Courses.name
+	requiredCourse -> Course.name
+OptionalForStudyProgramme(_studyProgramme_, _course_)
+	studyProgramme -> StudyProgrammes.name
+	course -> Courses.name
+MandatoryForStudyProgramme(_studyProgramme_, _course_)
+	studyProgramme -> StudyProgrammes.name
+	course -> Courses.name
+OptionalForBranch(_branch_, _course_)
+	branch -> Branches.name
+	course -> Courses.name
+MandatoryForBranch(_branch_, _course_)
+	branch -> Branches.name
+	course -> Courses.name
+RecommendedForBranch(_branch_, _course_)
+	branch -> Branches.name
+	course -> Courses.name
