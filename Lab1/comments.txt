@@ -1,9 +1,4 @@
 Assumptions made which were not explicitly in the domain description:
 
-* A teacher is identified by höna (his or her) name
-* A teacher can work at many departments
-
 * A student can be registered at Exactly one studyprogramme
-* A student registered at a given course reads it unless he has passed it or is waiting in line for it
-
-* Research-, Mathematical- and Seminarcourses are subclasses of Course since a course can have any combination of these classifications or none.
+* A student is registered at a date, and can wait in line for a restricted course. Joining relations registered and waitsfor gives us opportunity to later decide who is first in line.
