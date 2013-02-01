@@ -7,19 +7,20 @@ Branches(_name_, _studyProgramme_)
 	studyProgramme -> StudyProgrammes.name
 Students(_id_, name, studyProgramme)
 	studyProgramme -> StudyProgrammes.name
-MastersAt(_student_, _branch_, _studyProgramme_)
-	student -> Students.id
-	branch -> Branches.name
-	studyProgramme -> StudyProgrammes.name
+MastersAt(_student_, branch, studyProgramme)
+	(student, studyProgramme) -> Students.(id, studyProgramme) XXX
+	(branch, studyProgramme) -> Branches.(name, studyProgramme) XXX
 Courses(_name_, credits, department)
 	department -> Departments.name
-ClassifiedCourses(_course_, _classification_)
-	course -> Courses.name
-WaitsFor(_course_)
+CoursesClassification(_classification_)
+IsClassified(_course_, _classification_) XXX
+	course -> Course.name
+	classification -> CourseClassification.classification
+WaitsFor(_course_, sinceDate) XXX
 	course -> Courses.name
 RestrictedCourses(_course_, #maxStudents)
 	course -> Courses.name
-Registered(_student_, _course_, date)
+Registered(_student_, _course_)
 	student -> Students.id
 	course -> Courses.course
 Passed(_student_, _course_, grade)
@@ -31,9 +32,9 @@ Require(_course_, _requiredCourse_)
 MandatoryForStudyProgramme(_studyProgramme_, _course_)
 	studyProgramme -> StudyProgrammes.name
 	course -> Courses.name
-MandatoryForBranch(_branch_, _course_)
-	branch -> Branches.name
+MandatoryForBranch(_branch_, _course_, _studyProgramme_) XXX
+	(branch, studyProgramme) -> Branches.(name, studyProgramme)
 	course -> Courses.name
-RecommendedForBranch(_branch_, _course_)
-	branch -> Branches.name
+RecommendedForBranch(_branch_, _course_, _studyProgramme_) XXX
+	(branch, studyProgramme) -> Branches.(name, studyProgramme)
 	course -> Courses.name
