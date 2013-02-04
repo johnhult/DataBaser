@@ -24,7 +24,7 @@ RestrictedCourses(_course_, #maxStudents)
 Registered(_student_, _course_)
 	student -> Students.id
 	course -> Courses.code
-Passed(_student_, _course_, grade)
+Read(_student_, _course_, grade)
 	student -> Students.id
 	course -> Courses.code
 Require(_course_, _requiredCourse_)

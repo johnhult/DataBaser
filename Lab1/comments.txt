@@ -1,4 +1,1 @@
-Assumptions made which were not explicitly in the domain description:
-
-* A student can be registered at Exactly one studyprogramme
-* A student is registered at a date, and can wait in line for a restricted course. Joining relations registered and waitsfor gives us opportunity to later decide who is first in line.
+* Added Courses.code attribute as key instead of name all over the relation after speaking to lab consultant at tutorial.
