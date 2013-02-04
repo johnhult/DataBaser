@@ -1,0 +1,6 @@
+It seems that we caught most of the functional dependencies in Task 1.
+They were all already keys in our relational schema
+so no modifications were made due to these FDs in the new schema.
+
+We did however realize that our reference in relation WaitsFor was falsely pointing
+at Courses.code instead of RestrictedCourse.code

@@ -1,17 +1,20 @@
-Student
-	id ->> name, studyProgramme
+// A student is identified by its id which determines its name
+// and its programme
+id ->> name, studyProgramme
 
-MastersAt
-	student ->> studyProgramme, branch
+// Each student can belong to one branch, 
+// but we need his/her programme to be certain we have a valid branch
+id, studyProgramme ->> branch
 
-Read
-	student, course ->> grade
+// A given student has (at most) one grade per course
+id, code ->> grade
 
-Courses
-	code ->> department, credits
+// A course is given by one department and it always gives students the same 
+// amount of credits
+code ->> department, credits
 
-RestrictedCourse
-	course ->> #maxStudents
+// A restricted course can have one value for max students
+code ->> #maxStudents
 
-WaitsFor
-	student, restrictedCourse ->> sinceDate
+// A student can be waiting in line for a given course since one time in history
+id, code ->> sinceDate
