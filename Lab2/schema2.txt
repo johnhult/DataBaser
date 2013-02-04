@@ -1,0 +1,46 @@
+Departments(_name_)
+StudyProgrammes(_name_)
+Hosts(_studyProgramme_, _department_)
+	studyProgramme -> StudyProgrammes.name
+	department -> Departments.name
+Branches(_name_, _studyProgramme_)
+	studyProgramme -> StudyProgrammes.name
+Students(_id_, name, studyProgramme)
+	studyProgramme -> StudyProgrammes.name
+	id ->> name, studyProgramme 									// => Key
+MastersAt(_student_, branch, studyProgramme)
+	(student, studyProgramme) -> Students.(id, studyProgramme)
+	(branch, studyProgramme) -> Branches.(name, studyProgramme)
+	student ->> studyProgramme, branch 								// => Key
+Courses(_code_, credits, department)
+	department -> Departments.name
+CourseClassifications(_classification_)
+IsClassified(_course_, _classification_)
+	course -> Course.code
+	classification -> CourseClassifications.classification
+WaitsFor(_course_, _student_, sinceDate)
+	course -> RestrictedCourses.code 								// ###
+	student -> Students.id
+	student, restrictedCourse ->> sinceDate 						// => Key
+RestrictedCourses(_course_, #maxStudents)
+	course -> Courses.code
+	course ->> #maxStudents 										// => Key
+Registered(_student_, _course_)
+	student -> Students.id
+	course -> Courses.code
+Read(_student_, _course_, grade)
+	student -> Students.id
+	course -> Courses.code
+	student, course ->> grade 										// => Key
+Require(_course_, _requiredCourse_)
+	course -> Courses.code
+	requiredCourse -> Course.code
+MandatoryForStudyProgramme(_studyProgramme_, _course_)
+	studyProgramme -> StudyProgrammes.name
+	course -> Courses.code
+MandatoryForBranch(_branch_, _course_, _studyProgramme_)
+	(branch, studyProgramme) -> Branches.(name, studyProgramme)
+	course -> Courses.code
+RecommendedForBranch(_branch_, _course_, _studyProgramme_)
+	(branch, studyProgramme) -> Branches.(name, studyProgramme)
+	course -> Courses.code

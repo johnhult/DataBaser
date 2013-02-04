@@ -1,0 +1,17 @@
+Student
+	id ->> name, studyProgramme
+
+MastersAt
+	student ->> studyProgramme, branch
+
+Read
+	student, course ->> grade
+
+Courses
+	code ->> department, credits
+
+RestrictedCourse
+	course ->> #maxStudents
+
+WaitsFor
+	student, restrictedCourse ->> sinceDate
