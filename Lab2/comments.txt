@@ -4,3 +4,15 @@ so no modifications were made due to these FDs in the new schema.
 
 We did however realize that our reference in relation WaitsFor was falsely pointing
 at Courses.code instead of RestrictedCourse.code
+
+######################## New stuff ###################
+
+There exists a circular dependency for the MastersAt relation.
+This was already caught in our schema from lab1 with the line
+(student, studyProgramme) -> Students.(id, studyProgramme)
+In other words. The student may only master at branches of his or her own studyprogramme.
+
+A student must meet the requirements for each course
+before he can register for it.
+A student shan't be able to register for a course he has passed.
+We do not have the tools to capture these constraints in the schema however. So this will have to be done in a later stage.

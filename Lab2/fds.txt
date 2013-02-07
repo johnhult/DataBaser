@@ -18,3 +18,10 @@ code ->> #maxStudents
 
 // A student can be waiting in line for a given course since one time in history
 id, code ->> sinceDate
+
+########################## New stuff #################
+
+// For a given code and a given timestamp there can only be one (student)!
+sinceDate, code ->> id
+This modifies the schema at row 22
+course, sinceDate unique
