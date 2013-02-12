@@ -67,4 +67,61 @@ CREATE TABLE WaitsFor (
 	PRIMARY KEY (course) REFERENCES RestrictedCourses(code),
 	PRIMARY KEY (student) REFERENCES Students(id),
 	(course, sinceDate) UNIQUE
+
+CREATE TABLE RestrictedCourses(
+	course CHAR(6),
+	maxStudents INT,
+	PRIMARY KEY (course),
+	FOREIGN KEY (course) REFERENCES Courses(code)
+);
+
+CREATE TABLE Registered(
+	student CHAR(10),
+	course CHAR(6),
+	PRIMARY KEY (student, course),
+	FOREIGN KEY (student) REFERENCES Students(id),
+	FOREIGN KEY (course) REFERENCES Courses(code)
+);
+
+CREATE TABLE Read(
+	student CHAR(10),
+	course CHAR(6),
+	grade CHAR(1) CHECK (grade IN ('U', '1', '2', '3', '4')),
+	PRIMARY KEY (student, course),
+	FOREIGN KEY (student) REFERENCES Students(id),
+	FOREIGN KEY (course) REFERENCES Courses(code)
+);
+
+CREATE TABLE Require(
+	course CHAR(6),
+	requiredCoursCHAR(6),
+	PRIMARY KEY (course, requiredCourse),
+	FOREIGN KEY (course) REFERENCES Courses(code),
+	FOREIGN KEY (requiredCourse) REFERENCES Courses(code)
+);
+
+CREATE TABLE MandatoryForStudyProgramme(
+	studyProgramme VARCHAR(50),
+	course CHAR(6),
+	PRIMARY KEY (studyProgramme, course),
+	FOREIGN KEY (studyProgramme) REFERENCES StudyProgrammes(name),
+	FOREIGN KEY (course) REFERENCES Courses(code)
+);
+
+CREATE TABLE MandatoryForBranch(
+	branch VARCHAR(50),
+	course CHAR(6),
+	studyProgramme VARCHAR(50),
+	PRIMARY KEY (branch, course),
+	FOREIGN KEY (branch, studyProgramme) REFERENCES Branches(name, studyProgramme),
+	FOREIGN KEY (course) REFERENCES Courses(code)
+);
+
+CREATE TABLE RecommendedForBranch(
+	branch VARCHAR(50),
+	course CHAR(6),
+	studyProgramme VARCHAR(50),
+	PRIMARY KEY (branch, course),
+	FOREIGN KEY (branch, studyProgramme) REFERENCES Branches(name, studyProgramme),
+	FOREIGN KEY (course) REFERENCES Courses(code)
 );
