@@ -1,0 +1,12 @@
+begin
+for c in (select table_name from user_tables) loop
+execute immediate ('drop table '||c.table_name||' cascade constraints');
+end loop;
+end;
+/
+begin
+for c in (select * from user_objects) loop
+execute immediate ('drop '||c.object_type||' '||c.object_name);
+end loop;
+end;
+/
