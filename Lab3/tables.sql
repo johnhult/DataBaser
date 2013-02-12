@@ -3,7 +3,7 @@ CREATE TABLE Departments (
 	PRIMARY KEY (name)
 );
 
-CREATE TABLE StudyProgramme (
+CREATE TABLE StudyProgrammes (
 	name VARCHAR(50),
 	PRIMARY KEY (name)
 );
@@ -11,15 +11,15 @@ CREATE TABLE StudyProgramme (
 CREATE TABLE Hosts (
 	studyProgramme VARCHAR(50),
 	department VARCHAR(50),
-	PRIMARY KEY (studyProgramme, departments),
-	FOREIGN KEY (studyProgramme) REFERENCES StudyProgramme(name)
+	PRIMARY KEY (studyProgramme, department),
+	FOREIGN KEY (studyProgramme) REFERENCES StudyProgrammes(name)
 );
 
 CREATE TABLE Branches (
 	name VARCHAR(50),
 	studyProgramme VARCHAR(50),
 	PRIMARY KEY (name, studyProgramme),
-	FOREIGN KEY (studyProgramme) REFERENCES StudyProgramme(name)
+	FOREIGN KEY (studyProgramme) REFERENCES StudyProgrammes(name)
 );
 
 CREATE TABLE Students (
@@ -27,7 +27,8 @@ CREATE TABLE Students (
 	name VARCHAR(50),
 	studyProgramme VARCHAR(50),
 	PRIMARY KEY (id),
-	FOREIGN KEY (studyProgramme) REFERENCES StudyProgramme(name)
+	FOREIGN KEY (studyProgramme) REFERENCES StudyProgrammes(name),
+	UNIQUE (id, studyProgramme)
 );
 
 CREATE TABLE MastersAt (
@@ -35,7 +36,7 @@ CREATE TABLE MastersAt (
 	branch VARCHAR(50),
 	studyProgramme VARCHAR(50),
 	PRIMARY KEY (student),
-	FOREIGN KEY (student, branch) REFERENCES Students(id, studyProgramme),
+	FOREIGN KEY (student, studyProgramme) REFERENCES Students(id, studyProgramme),
 	FOREIGN KEY (branch, studyProgramme) REFERENCES Branches(name, studyProgramme)
 );
 
@@ -56,7 +57,7 @@ CREATE TABLE IsClassified (
 	course CHAR(6),
 	classification VARCHAR(50),
 	PRIMARY KEY (course, classification),
-	FOREIGN KEY (course) REFERENCES Courses(name),
+	FOREIGN KEY (course) REFERENCES Courses(code),
 	FOREIGN KEY (classification) REFERENCES CourseClassifications(classification)
 );
 
@@ -64,9 +65,11 @@ CREATE TABLE WaitsFor (
 	course CHAR(6),
 	student CHAR(10),
 	sinceDate DATE,
-	PRIMARY KEY (course) REFERENCES RestrictedCourses(code),
-	PRIMARY KEY (student) REFERENCES Students(id),
-	(course, sinceDate) UNIQUE
+	PRIMARY KEY (course, student),
+	FOREIGN KEY (course) REFERENCES RestrictedCourses(course),
+	FOREIGN KEY (student) REFERENCES Students(id),
+	UNIQUE (course, sinceDate)
+);
 
 CREATE TABLE RestrictedCourses(
 	course CHAR(6),
@@ -94,7 +97,7 @@ CREATE TABLE Read(
 
 CREATE TABLE Require(
 	course CHAR(6),
-	requiredCoursCHAR(6),
+	requiredCourse CHAR(6),
 	PRIMARY KEY (course, requiredCourse),
 	FOREIGN KEY (course) REFERENCES Courses(code),
 	FOREIGN KEY (requiredCourse) REFERENCES Courses(code)
