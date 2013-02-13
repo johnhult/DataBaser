@@ -61,6 +61,13 @@ CREATE TABLE IsClassified (
 	FOREIGN KEY (classification) REFERENCES CourseClassifications(classification)
 );
 
+CREATE TABLE RestrictedCourses(
+	course CHAR(6),
+	maxStudents INT,
+	PRIMARY KEY (course),
+	FOREIGN KEY (course) REFERENCES Courses(code)
+);
+
 CREATE TABLE WaitsFor (
 	course CHAR(6),
 	student CHAR(10),
@@ -69,13 +76,6 @@ CREATE TABLE WaitsFor (
 	FOREIGN KEY (course) REFERENCES RestrictedCourses(course),
 	FOREIGN KEY (student) REFERENCES Students(id),
 	UNIQUE (course, sinceDate)
-);
-
-CREATE TABLE RestrictedCourses(
-	course CHAR(6),
-	maxStudents INT,
-	PRIMARY KEY (course),
-	FOREIGN KEY (course) REFERENCES Courses(code)
 );
 
 CREATE TABLE Registered(
@@ -89,7 +89,7 @@ CREATE TABLE Registered(
 CREATE TABLE Read(
 	student CHAR(10),
 	course CHAR(6),
-	grade CHAR(1) CHECK (grade IN ('U', '1', '2', '3', '4')),
+	grade CHAR(1) CHECK (grade IN ('U', '3', '4', '5')),
 	PRIMARY KEY (student, course),
 	FOREIGN KEY (student) REFERENCES Students(id),
 	FOREIGN KEY (course) REFERENCES Courses(code)
