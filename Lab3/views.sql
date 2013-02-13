@@ -32,14 +32,9 @@ CREATE VIEW PassedCourses AS
 	AND grade != 'U';
 
 CREATE VIEW UnreadMandatory AS
-	(SELECT id AS studentId, course
-	FROM MandatoryForStudyProgramme, Students
-	WHERE (course, id) NOT IN (SELECT course, student 
-								FROM Read
-								WHERE grade != 'U'))
-	UNION
-	(SELECT id AS studentId, course
-	FROM MandatoryForBranch, Students
-	WHERE (course, id) NOT IN (SELECT course, student
-								FROM Read
-								WHERE grade != 'U'));
+	WITH Mandatory AS
+		(SELECT course 
+		 FROM MandatoryForStudyProgramme NATURAL JOIN MandatoryForBranch)
+	SELECT id as studentId, course
+	FROM Mandatory, Students
+	WHERE (course, id) NOT IN (SELECT course, student FROM Read WHERE grade != 'U');
