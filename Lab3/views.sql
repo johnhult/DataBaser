@@ -1,7 +1,11 @@
 CREATE VIEW StudentsFollowing AS
 	SELECT id AS studentId, MastersAt.studyProgramme AS studyProgramme, branch
 	FROM Students, MastersAt
-	WHERE student = id;
+	WHERE student = id
+	UNION
+	SELECT id AS studentId, studyProgramme, NULL
+	FROM Students
+	WHERE id NOT IN (SELECT student FROM MastersAt);
 
 CREATE VIEW FinishedCourses AS
 	SELECT id AS studentId, code AS course, grade, credits
@@ -10,41 +14,61 @@ CREATE VIEW FinishedCourses AS
 		AND course = code;
 
 CREATE VIEW Registrations AS
-	WITH R AS
-		(SELECT student, course, 'Registered' AS status
-		 FROM Registered),
-		 WF AS
-		(SELECT student, course, 'Waiting' AS status
-		 FROM WaitsFor)
-	SELECT id AS studentId, course, status
-	FROM Students, R NATURAL JOIN WF
-	WHERE id = student;
+		WITH R AS
+			(SELECT student, course, 'Registered' AS status
+			 FROM Registered),
+			 WF AS
+			(SELECT student, course, 'Waiting' AS status
+			 FROM WaitsFor)
+		SELECT id AS studentId, course, status
+		FROM Students, R
+		WHERE id = student
+	UNION
+		SELECT id AS studentId, course, status
+		FROM Students, WF
+		WHERE id = student;
 
 CREATE VIEW CourseQueuePositions AS
 	SELECT student AS studentId, course,
-		ROW_NUMBER() OVER (ORDER BY sinceDate ASC) AS p1osition
+		ROW_NUMBER() OVER (PARTITION BY course ORDER BY sinceDate ASC) AS p1osition
 	FROM WaitsFor;
 
 CREATE VIEW PassedCourses AS
 	SELECT id AS studentId, course, grade, credits
 	FROM Students, Courses, Read
 	WHERE course = code
-	AND grade != 'U';
+	AND student = id
+	AND grade != 'U'
+	ORDER BY id;
 
 CREATE VIEW UnreadMandatory AS
 	WITH Mandatory AS
-		(SELECT course 
-		 FROM MandatoryForStudyProgramme NATURAL JOIN MandatoryForBranch)
+			(SELECT id AS studentId, course, B.studyProgramme, branch
+			FROM Students, MandatoryForBranch B
+			WHERE B.studyProgramme = Students.studyProgramme
+		UNION
+			SELECT id as studentId, course, P.studyProgramme, NULL		
+			FROM Students, MandatoryForStudyProgramme P
+			WHERE Students.studyProgramme = P.studyProgramme)
+	SELECT *
+	FROM Mandatory
+	WHERE (studentId, course) NOT IN (SELECT student, course FROM Read)
+
+	WITH Mandatory AS
+		(SELECT course, studyProgramme, branch
+		 FROM MandatoryForStudyProgramme P, MandatoryForBranch B
+		 WHERE B.studyProgramme = P.studyProgramme)
 	SELECT id as studentId, course
 	FROM Mandatory, Students
 	WHERE (course, id) NOT IN (SELECT course, student FROM Read WHERE grade != 'U');
 
 CREATE VIEW PathToGraduation AS
-	WITH AchievedCredits AS
-		(SELECT student, credits
+	WITH AchievedCredits AS # This one's okay
+		(SELECT id, SUM(credits) AS acredits
 		 FROM Courses, Read, Students
-		 WHERE code = course AND id = student),
-	BranchCredits AS
+		 WHERE code = course AND id = student
+		 GROUP BY id),
+	BranchCredits AS # The rest are not
 		(SELECT id, credits AS bcredits
 		 FROM Students, RecommendedForBranch RFB, Courses
 		 WHERE course = code
@@ -73,12 +97,12 @@ CREATE VIEW PathToGraduation AS
 		 GROUP BY id)
 	SELECT
 		id AS studentId,
-		credits AS achievedCredits,
+		acredits AS achievedCredits,
 		bcredits AS branchRecommendedCredits,
 		mcredits AS mathematicalCredits,
 		rcredits AS reserachCredits,
 		scourses AS seminarCourses,
 		mcourses AS mandatoryCoursesLeft
-	FROM Students, AchievedCredits NATURAL JOIN BranchCredits
+	FROM Students NATURAL JOIN AchievedCredits NATURAL JOIN BranchCredits
 		 NATURAL JOIN MathCredits NATURAL JOIN ResearchCredits
 		 NATURAL JOIN SeminarCourses NATURAL JOIN MandatoryCourses;
