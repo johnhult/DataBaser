@@ -1,3 +1,10 @@
+#We added a couple of more rows in order to
+#be able to test our PathToGraduation view.
+#We added a new course that was going to give 
+#our student 0000000004 everything he needed
+#in order to graduate.
+
+
 #Four departments
 INSERT INTO Departments VALUES ('Data');
 INSERT INTO Departments VALUES ('Elektro');
