@@ -52,23 +52,15 @@ CREATE VIEW UnreadMandatory AS
 			WHERE Students.studyProgramme = P.studyProgramme)
 	SELECT *
 	FROM Mandatory
-	WHERE (studentId, course) NOT IN (SELECT student, course FROM Read)
-
-	WITH Mandatory AS
-		(SELECT course, studyProgramme, branch
-		 FROM MandatoryForStudyProgramme P, MandatoryForBranch B
-		 WHERE B.studyProgramme = P.studyProgramme)
-	SELECT id as studentId, course
-	FROM Mandatory, Students
-	WHERE (course, id) NOT IN (SELECT course, student FROM Read WHERE grade != 'U');
+	WHERE (studentId, course) NOT IN (SELECT studentId, course FROM PassedCourses)
 
 CREATE VIEW PathToGraduation AS
-	WITH AchievedCredits AS # This one's okay
+	WITH AchievedCredits AS
 		(SELECT id, SUM(credits) AS acredits
-		 FROM Courses, Read, Students
-		 WHERE code = course AND id = student
+		 FROM Courses, Students
+		 WHERE (id, code) IN (SELECT studentId, course FROM PassedCourses)
 		 GROUP BY id),
-	BranchCredits AS # The rest are not
+	BranchCredits AS
 		(SELECT id, credits AS bcredits
 		 FROM Students, RecommendedForBranch RFB, Courses
 		 WHERE course = code
@@ -89,6 +81,7 @@ CREATE VIEW PathToGraduation AS
 		(SELECT id, COUNT(*) AS scourses
 		 FROM Students, IsClassified NATURAL JOIN PassedCourses
 		 WHERE id = studentId
+		 AND classification = 'Seminar'
 		 GROUP BY id),
 	MandatoryCourses AS
 		(SELECT id, COUNT(*) AS mcourses
@@ -103,6 +96,7 @@ CREATE VIEW PathToGraduation AS
 		rcredits AS reserachCredits,
 		scourses AS seminarCourses,
 		mcourses AS mandatoryCoursesLeft
-	FROM Students NATURAL JOIN AchievedCredits NATURAL JOIN BranchCredits
-		 NATURAL JOIN MathCredits NATURAL JOIN ResearchCredits
-		 NATURAL JOIN SeminarCourses NATURAL JOIN MandatoryCourses;
+	FROM Students NATURAL LEFT OUTER JOIN AchievedCredits NATURAL LEFT OUTER JOIN BranchCredits
+		 NATURAL LEFT OUTER JOIN MathCredits NATURAL LEFT OUTER JOIN ResearchCredits
+		 NATURAL LEFT OUTER JOIN SeminarCourses NATURAL LEFT OUTER JOIN MandatoryCourses
+	 ORDER BY id;
