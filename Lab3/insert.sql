@@ -28,6 +28,7 @@ INSERT INTO MastersAt VALUES ('0000000001', 'Programming', 'ITProg');
 INSERT INTO MastersAt VALUES ('0000000002', 'Programming', 'DataProg');
 INSERT INTO MastersAt VALUES ('0000000003', 'Syror', 'KemiProg');
 INSERT INTO MastersAt VALUES ('0000000005', 'Programming', 'DataProg');
+INSERT INTO MastersAt VALUES ('0000000004', 'Syror', 'ElektroProg');
 
 INSERT INTO Courses VALUES ('TDA001', 10, 'IT');
 INSERT INTO Courses VALUES ('TDA002', 20, 'Data');
@@ -37,6 +38,7 @@ INSERT INTO Courses VALUES ('XRO807', 40, 'IT');
 INSERT INTO Courses VALUES ('TDA003', 1, 'Data');
 INSERT INTO Courses VALUES ('TDA004', 500, 'Elektro');
 INSERT INTO Courses VALUES ('TDA005', 20, 'IT');
+INSERT INTO Courses VALUES ('TST007', 100, 'Data');
 
 INSERT INTO CourseClassifications VALUES ('Mathematical');
 INSERT INTO CourseClassifications VALUES ('Seminar');
@@ -45,6 +47,9 @@ INSERT INTO CourseClassifications VALUES ('Research');
 INSERT INTO IsClassified VALUES ('TDA001', 'Seminar');
 INSERT INTO IsClassified VALUES ('XRO807', 'Mathematical');
 INSERT INTO IsClassified VALUES ('TNT666', 'Research');
+INSERT INTO IsClassified VALUES ('TST007', 'Seminar');
+INSERT INTO IsClassified VALUES ('TST007', 'Mathematical');
+INSERT INTO IsClassified VALUES ('TST007', 'Research');
 
 INSERT INTO RestrictedCourses VALUES ('TNT666', 20);
 INSERT INTO RestrictedCourses VALUES ('LOL101', 500);
@@ -61,6 +66,7 @@ INSERT INTO Read VALUES ('0000000002', 'TDA001', '4');
 INSERT INTO Read VALUES ('0000000002', 'TDA002', '5');
 INSERT INTO Read VALUES ('0000000001', 'XRO807', '5');
 INSERT INTO Read VALUES ('0000000001', 'TDA005', 'U');
+INSERT INTO Read VALUES ('0000000004', 'TST007', '5');
 
 INSERT INTO Require VALUES ('TDA002', 'TDA001');
 INSERT INTO Require VALUES ('TDA002', 'TDA003');
@@ -68,9 +74,11 @@ INSERT INTO Require VALUES ('TDA004', 'TDA003');
 
 INSERT INTO MandatoryForStudyProgramme VALUES ('KemiProg', 'TNT666');
 INSERT INTO MandatoryForStudyProgramme VALUES ('ITProg', 'TDA001');
+INSERT INTO MandatoryForStudyProgramme VALUES ('ElektroProg', 'TST007');
 
 INSERT INTO MandatoryForBranch VALUES ('Programming', 'TDA002', 'ITProg');
 INSERT INTO MandatoryForBranch VALUES ('Programming', 'TDA001', 'DataProg');
 INSERT INTO MandatoryForBranch VALUES ('Syror', 'XRO807', 'KemiProg');
+INSERT INTO MandatoryForBranch VALUES ('Syror', 'TST007', 'ElektroProg');
 
 INSERT INTO RecommendedForBranch VALUES ('Syror', 'TNT666', 'KemiProg');
