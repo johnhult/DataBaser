@@ -87,7 +87,12 @@ CREATE VIEW PathToGraduation AS
 		(SELECT id, COUNT(*) AS mcourses
 		 FROM Students, UnreadMandatory
 		 WHERE id = studentId
-		 GROUP BY id)
+		 GROUP BY id),
+	Attributes AS
+		(SELECT *
+		 FROM Students NATURAL LEFT OUTER JOIN AchievedCredits NATURAL LEFT OUTER JOIN BranchCredits
+		 NATURAL LEFT OUTER JOIN MathCredits NATURAL LEFT OUTER JOIN ResearchCredits
+		 NATURAL LEFT OUTER JOIN SeminarCourses NATURAL LEFT OUTER JOIN MandatoryCourses)
 	SELECT
 		id AS studentId,
 		acredits AS achievedCredits,
@@ -95,8 +100,8 @@ CREATE VIEW PathToGraduation AS
 		mcredits AS mathematicalCredits,
 		rcredits AS reserachCredits,
 		scourses AS seminarCourses,
-		mcourses AS mandatoryCoursesLeft
-	FROM Students NATURAL LEFT OUTER JOIN AchievedCredits NATURAL LEFT OUTER JOIN BranchCredits
-		 NATURAL LEFT OUTER JOIN MathCredits NATURAL LEFT OUTER JOIN ResearchCredits
-		 NATURAL LEFT OUTER JOIN SeminarCourses NATURAL LEFT OUTER JOIN MandatoryCourses
-	 ORDER BY id;
+		mcourses AS mandatoryCoursesLeft,
+		(CASE WHEN bcredits >= 10 AND mcredits >= 20 AND scourses >= 1 AND mcourses = 0 AND rcredits >= 10
+			THEN 'TRUE' ELSE 'FALSE' END) AS qualifiedForGraduation
+	FROM Attributes
+ 	ORDER BY id;
