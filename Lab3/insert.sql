@@ -17,6 +17,7 @@ INSERT INTO Hosts VALUES ('KemiProg', 'IT');
 INSERT INTO Branches VALUES ('Programming', 'ITProg');
 INSERT INTO Branches VALUES ('Programming', 'DataProg');
 INSERT INTO Branches VALUES ('Syror', 'KemiProg');
+INSERT INTO Branches VALUES ('Robotfight', 'ElektroProg');
 
 INSERT INTO Students VALUES ('0000000001', 'John', 'ITProg');
 INSERT INTO Students VALUES ('0000000002', 'Anton', 'DataProg');
@@ -28,7 +29,7 @@ INSERT INTO MastersAt VALUES ('0000000001', 'Programming', 'ITProg');
 INSERT INTO MastersAt VALUES ('0000000002', 'Programming', 'DataProg');
 INSERT INTO MastersAt VALUES ('0000000003', 'Syror', 'KemiProg');
 INSERT INTO MastersAt VALUES ('0000000005', 'Programming', 'DataProg');
-INSERT INTO MastersAt VALUES ('0000000004', 'Syror', 'ElektroProg');
+INSERT INTO MastersAt VALUES ('0000000004', 'Robotfight', 'ElektroProg');
 
 INSERT INTO Courses VALUES ('TDA001', 10, 'IT');
 INSERT INTO Courses VALUES ('TDA002', 20, 'Data');
@@ -79,6 +80,7 @@ INSERT INTO MandatoryForStudyProgramme VALUES ('ElektroProg', 'TST007');
 INSERT INTO MandatoryForBranch VALUES ('Programming', 'TDA002', 'ITProg');
 INSERT INTO MandatoryForBranch VALUES ('Programming', 'TDA001', 'DataProg');
 INSERT INTO MandatoryForBranch VALUES ('Syror', 'XRO807', 'KemiProg');
-INSERT INTO MandatoryForBranch VALUES ('Syror', 'TST007', 'ElektroProg');
+INSERT INTO MandatoryForBranch VALUES ('Robotfight', 'TST007', 'ElektroProg');
 
 INSERT INTO RecommendedForBranch VALUES ('Syror', 'TNT666', 'KemiProg');
+INSERT INTO RecommendedForBranch VALUES ('Robotfight', 'TST007', 'ElektroProg');
