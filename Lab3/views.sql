@@ -52,7 +52,7 @@ CREATE VIEW UnreadMandatory AS
 			WHERE Students.studyProgramme = P.studyProgramme)
 	SELECT *
 	FROM Mandatory
-	WHERE (studentId, course) NOT IN (SELECT studentId, course FROM PassedCourses)
+	WHERE (studentId, course) NOT IN (SELECT studentId, course FROM PassedCourses);
 
 CREATE VIEW PathToGraduation AS
 	WITH AchievedCredits AS
