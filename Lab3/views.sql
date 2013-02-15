@@ -52,7 +52,7 @@ CREATE VIEW UnreadMandatory AS
 			WHERE Students.studyProgramme = P.studyProgramme)
 	SELECT *
 	FROM Mandatory
-	WHERE (studentId, course) NOT IN (SELECT studentId, course FROM PassedCourses)
+	WHERE (studentId, course) NOT IN (SELECT studentId, course FROM PassedCourses);
 
 CREATE VIEW PathToGraduation AS
 	WITH AchievedCredits AS
@@ -84,10 +84,15 @@ CREATE VIEW PathToGraduation AS
 		 AND classification = 'Seminar'
 		 GROUP BY id),
 	MandatoryCourses AS
-		(SELECT id, COUNT(*) AS mcourses
-		 FROM Students, UnreadMandatory
-		 WHERE id = studentId
-		 GROUP BY id),
+		(SELECT * FROM
+			(SELECT id, COUNT(*) AS mcourses
+			 FROM Students, UnreadMandatory
+			 WHERE id = studentId
+			 GROUP BY id)
+		UNION
+			(SELECT id, 0 AS mcourses
+			 FROM Students
+			 WHERE id NOT IN (SELECT studentid FROM UnreadMandatory))),
 	Attributes AS
 		(SELECT *
 		 FROM Students NATURAL LEFT OUTER JOIN AchievedCredits NATURAL LEFT OUTER JOIN BranchCredits
