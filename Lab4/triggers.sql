@@ -11,13 +11,24 @@ CREATE OR REPLACE TRIGGER RegCourse
 			FROM RestrictedCourses
 			WHERE course = :reg.course;
 
-			SELECT COUNT(*) INTO registeredStudents
+			SELECT NVL(COUNT(*), 0) INTO registeredStudents
 			FROM Registrations
 			WHERE status = 'Registered'
 			AND course = :reg.course;
+
+			BEGIN
+				SELECT studentId INTO hasPassed 
+				FROM PassedCourses
+				WHERE studentId = :reg.studentId
+				AND course = :reg.course;
+				
+				EXCEPTION
+					WHEN NO_DATA_FOUND THEN
+						hasPassed := 'XXXXXXXXX';
+			END;
 			
 			/* Only allow students to register for courses they have not passed */
-			/*IF () THEN*/
+			IF (hasPassed = 'XXXXXXXXX') THEN
 				IF (maxStudents <= registeredStudents) THEN
 					/* Put in waiting list */
 					INSERT INTO WaitsFor
@@ -27,8 +38,7 @@ CREATE OR REPLACE TRIGGER RegCourse
 					INSERT INTO Registered
 					VALUES (:reg.studentId, :reg.course);
 				END IF;
-			/*END IF;*/
-			/* TODO THROW ERROR ? */
+			END IF;
 		END;
 
 
