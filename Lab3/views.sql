@@ -30,7 +30,7 @@ CREATE VIEW Registrations AS
 
 CREATE VIEW CourseQueuePositions AS
 	SELECT student AS studentId, course,
-		ROW_NUMBER() OVER (PARTITION BY course ORDER BY sinceDate ASC) AS p1osition
+		ROW_NUMBER() OVER (PARTITION BY course ORDER BY sinceDate ASC) AS position
 	FROM WaitsFor;
 
 CREATE VIEW PassedCourses AS
