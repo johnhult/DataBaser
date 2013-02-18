@@ -64,7 +64,8 @@ CREATE OR REPLACE TRIGGER Unregistered
 		BEGIN
 			SELECT status INTO waitingStatus
 			FROM Registrations
-			WHERE studentId = :unreg.status;
+			WHERE studentId = :unreg.studentId
+			AND course = :unreg.course;
 
 			SELECT maxStudents INTO maxStudentsAllowed
 			FROM RestrictedCourses
@@ -72,16 +73,19 @@ CREATE OR REPLACE TRIGGER Unregistered
 
 
 			IF (waitingStatus = 'Registered') THEN
-				DELETE FROM Registered WHERE (:unreg.studentId = Registered.student
-				AND :unreg.course = Registered.course);
+				DELETE FROM Registered
+				WHERE :unreg.studentId = Registered.student
+				AND :unreg.course = Registered.course;
 
-			ELSE DELETE FROM WaitsFor WHERE (:unreg.studentId = WaitsFor.student
-				AND :unreg.course = WaitsFor.course);
+			ELSE
+				DELETE FROM WaitsFor
+				WHERE :unreg.studentId = WaitsFor.student
+				AND :unreg.course = WaitsFor.course;
 			END IF;
 
-			SELECT COUNT(*) INTO nrStudentsInClass 
+			SELECT COUNT(*) INTO nrStudentsInClass
 			FROM Registered
-			WHERE course = :unreg.course;
+			WHERE Registered.course = :unreg.course;
 
 			IF (nrStudentsInClass < maxStudentsAllowed) THEN
 				SELECT NVL(studentId, '0') INTO firstPersonInQueue
@@ -89,9 +93,17 @@ CREATE OR REPLACE TRIGGER Unregistered
 				WHERE course = :unreg.course
 					AND position = 1;
 				IF (firstPersonInQueue != '0') THEN
-					INSERT INTO Registered VALUES (firstPersonInQueue, :unreg.course);
+					INSERT INTO Registered
+					VALUES (firstPersonInQueue, :unreg.course);
+					
+					DELETE FROM WaitsFor
+					WHERE firstPersonInQueue = student
+					AND :unreg.course = course;
 				END IF;
 			END IF;
 		END;
 
+DELETE FROM Registrations
+WHERE course = 'RST000' AND studentId = '0000000002';
 
+select * from Registrations where course = 'RST000'
