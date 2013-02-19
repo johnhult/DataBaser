@@ -7,10 +7,17 @@ CREATE OR REPLACE TRIGGER RegCourse
 			maxStudents INT;
 			registeredStudents INT;
 		BEGIN
-			SELECT maxStudents INTO maxStudents
-			FROM RestrictedCourses
-			WHERE course = :reg.course;
+			BEGIN
+				SELECT maxStudents INTO maxStudents
+				FROM RestrictedCourses
+				WHERE course = :reg.course;
 
+				EXCEPTION
+					WHEN NO_DATA_FOUND THEN
+						maxStudents := -1;
+			END;
+
+			/* Does not throw exception when data is not found, ok */
 			SELECT NVL(COUNT(*), 0) INTO registeredStudents
 			FROM Registrations
 			WHERE status = 'Registered'
@@ -29,7 +36,8 @@ CREATE OR REPLACE TRIGGER RegCourse
 			
 			/* Only allow students to register for courses they have not passed */
 			IF (hasPassed = 'XXXXXXXXX') THEN
-				IF (maxStudents <= registeredStudents) THEN
+				/* maxStudents = -1 means we have an unrestricted course with unlimited seats */
+				IF (maxStudents <= registeredStudents AND maxStudents != -1) THEN
 					/* Put in waiting list */
 					INSERT INTO WaitsFor
 					VALUES (:reg.course, :reg.studentId, sysdate);
