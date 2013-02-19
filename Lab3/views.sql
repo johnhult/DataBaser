@@ -1,9 +1,9 @@
 CREATE VIEW StudentsFollowing AS
-	SELECT id AS studentId, MastersAt.studyProgramme AS studyProgramme, branch
+	SELECT id AS studentId, name, MastersAt.studyProgramme AS studyProgramme, branch
 	FROM Students, MastersAt
 	WHERE student = id
 	UNION
-	SELECT id AS studentId, studyProgramme, NULL
+	SELECT id AS studentId, name, studyProgramme, NULL
 	FROM Students
 	WHERE id NOT IN (SELECT student FROM MastersAt);
 
@@ -43,11 +43,11 @@ CREATE VIEW PassedCourses AS
 
 CREATE VIEW UnreadMandatory AS
 	WITH Mandatory AS
-			(SELECT id AS studentId, course, B.studyProgramme, branch
+			(SELECT id AS studentId, course
 			FROM Students, MandatoryForBranch B
 			WHERE B.studyProgramme = Students.studyProgramme
 		UNION
-			SELECT id as studentId, course, P.studyProgramme, NULL		
+			SELECT id as studentId, course
 			FROM Students, MandatoryForStudyProgramme P
 			WHERE Students.studyProgramme = P.studyProgramme)
 	SELECT *
@@ -57,26 +57,29 @@ CREATE VIEW UnreadMandatory AS
 CREATE VIEW PathToGraduation AS
 	WITH AchievedCredits AS
 		(SELECT id, SUM(credits) AS acredits
-		 FROM Courses, Students
+		 FROM Students, Courses
 		 WHERE (id, code) IN (SELECT studentId, course FROM PassedCourses)
 		 GROUP BY id),
 	BranchCredits AS
-		(SELECT id, credits AS bcredits
+		(SELECT id, SUM(credits) AS bcredits
 		 FROM Students, RecommendedForBranch RFB, Courses
 		 WHERE course = code
-		 AND (id, course) IN (SELECT studentId, course FROM PassedCourses)),
+		 AND (id, course) IN (SELECT studentId, course FROM PassedCourses)
+		 GROUP BY id),
 	MathCredits AS
-		(SELECT id, credits AS mcredits
+		(SELECT id, SUM(credits) AS mcredits
 		 FROM Students, IsClassified, Courses
 		 WHERE classification = 'Mathematical'
 		 AND course = code
-		 AND (id, course) IN (SELECT studentId, course FROM PassedCourses)),
+		 AND (id, course) IN (SELECT studentId, course FROM PassedCourses)
+		 GROUP BY id),
 	ResearchCredits AS
-		(SELECT id, credits AS rcredits
+		(SELECT id, SUM(credits) AS rcredits
 		 FROM Students, IsClassified, Courses
 		 WHERE classification = 'Research'
 		 AND course = code
-		 AND (id, course) IN (SELECT studentId, course FROM PassedCourses)),
+		 AND (id, course) IN (SELECT studentId, course FROM PassedCourses)
+		 GROUP BY id),
 	SeminarCourses AS
 		(SELECT id, COUNT(*) AS scourses
 		 FROM Students, IsClassified NATURAL JOIN PassedCourses
@@ -100,12 +103,12 @@ CREATE VIEW PathToGraduation AS
 		 NATURAL LEFT OUTER JOIN SeminarCourses NATURAL LEFT OUTER JOIN MandatoryCourses)
 	SELECT
 		id AS studentId,
-		acredits AS achievedCredits,
-		bcredits AS branchRecommendedCredits,
-		mcredits AS mathematicalCredits,
-		rcredits AS reserachCredits,
-		scourses AS seminarCourses,
-		mcourses AS mandatoryCoursesLeft,
+		NVL(acredits, 0) AS achievedCredits,
+		NVL(bcredits, 0) AS branchRecommendedCredits,
+		NVL(mcredits, 0) AS mathematicalCredits,
+		NVL(rcredits, 0) AS reserachCredits,
+		NVL(scourses, 0) AS seminarCourses,
+		NVL(mcourses, 0) AS mandatoryCoursesLeft,
 		(CASE WHEN bcredits >= 10 AND mcredits >= 20 AND scourses >= 1 AND mcourses = 0 AND rcredits >= 10
 			THEN 'TRUE' ELSE 'FALSE' END) AS qualifiedForGraduation
 	FROM Attributes

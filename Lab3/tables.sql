@@ -42,7 +42,7 @@ CREATE TABLE MastersAt (
 
 CREATE TABLE Courses (
 	code CHAR(6),
-	credits INT,
+	credits INT CHECK (credits > 0),
 	department VARCHAR(50),
 	PRIMARY KEY (code),
 	FOREIGN KEY (department) REFERENCES Departments(name)
@@ -63,7 +63,7 @@ CREATE TABLE IsClassified (
 
 CREATE TABLE RestrictedCourses(
 	course CHAR(6),
-	maxStudents INT,
+	maxStudents INT CHECK (credits > 0),
 	PRIMARY KEY (course),
 	FOREIGN KEY (course) REFERENCES Courses(code)
 );
@@ -98,6 +98,7 @@ CREATE TABLE Read(
 CREATE TABLE Require(
 	course CHAR(6),
 	requiredCourse CHAR(6),
+	CHECK (course <> requiredCourse),
 	PRIMARY KEY (course, requiredCourse),
 	FOREIGN KEY (course) REFERENCES Courses(code),
 	FOREIGN KEY (requiredCourse) REFERENCES Courses(code)
