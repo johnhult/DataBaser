@@ -63,7 +63,7 @@ CREATE TABLE IsClassified (
 
 CREATE TABLE RestrictedCourses(
 	course CHAR(6),
-	maxStudents INT CHECK (credits > 0),
+	maxStudents INT CHECK (maxStudents > 0),
 	PRIMARY KEY (course),
 	FOREIGN KEY (course) REFERENCES Courses(code)
 );
