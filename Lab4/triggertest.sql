@@ -10,8 +10,8 @@ INSERT INTO Courses VALUES ('URS000', 10, 'Kemi');
  */
 INSERT INTO Registrations VALUES ('0000000001', 'RST000', 'Registered');
 INSERT INTO Registrations VALUES ('0000000002', 'RST000', 'Registered');
-INSERT INTO Registrations VALUES ('0000000004', 'RST000', 'Registered');
 INSERT INTO Registrations VALUES ('0000000003', 'RST000', 'Registered');
+INSERT INTO Registrations VALUES ('0000000004', 'RST000', 'Registered');
 
 /* Registrations for unrestricted course, everyone should be registered */
 INSERT INTO Registrations VALUES ('0000000001', 'URS000', 'Registered');
@@ -28,5 +28,5 @@ INSERT INTO Registrations VALUES ('0000000005', 'RST000', 'Registered');
 
 
 /* Views displaying data above, read comments for how it should look */
-SELECT * FROM Registrations WHERE course = 'RST000';
-SELECT * FROM CourseQueuePositions WHERE course = 'RST000';
+SELECT * FROM Registrations WHERE course = 'RST000' OR course = 'URS000' ORDER BY course;
+SELECT * FROM CourseQueuePositions WHERE course = 'RST000' OR course = 'URS000' ORDER BY course; 

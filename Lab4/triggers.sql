@@ -6,7 +6,22 @@ CREATE OR REPLACE TRIGGER RegCourse
 			hasPassed CHAR(10);
 			maxStudents INT;
 			registeredStudents INT;
+			isRegistered INT;
 		BEGIN
+		/* Make sure a student can not register for a course höna is already
+		 * registered for.
+		 */
+			BEGIN 
+				SELECT 1 INTO isRegistered
+				FROM Registrations
+				WHERE studentId = :reg.studentId
+				AND course = :reg.course;
+
+				EXCEPTION
+					WHEN NO_DATA_FOUND THEN
+						isRegistered := 0;
+			END;
+
 			BEGIN
 				SELECT maxStudents INTO maxStudents
 				FROM RestrictedCourses
@@ -31,11 +46,11 @@ CREATE OR REPLACE TRIGGER RegCourse
 				
 				EXCEPTION
 					WHEN NO_DATA_FOUND THEN
-						hasPassed := 'XXXXXXXXX';
+						hasPassed := '0';
 			END;
 			
 			/* Only allow students to register for courses they have not passed */
-			IF (hasPassed = 'XXXXXXXXX') THEN
+			IF (hasPassed = '0' AND isRegistered = 0) THEN
 				/* maxStudents = -1 means we have an unrestricted course with unlimited seats */
 				IF (maxStudents <= registeredStudents AND maxStudents != -1) THEN
 					/* Put in waiting list */
@@ -46,6 +61,7 @@ CREATE OR REPLACE TRIGGER RegCourse
 					INSERT INTO Registered
 					VALUES (:reg.studentId, :reg.course);
 				END IF;
+			/* TODO, Add some sort of exception marking that we did not insert */
 			END IF;
 		END;
 
