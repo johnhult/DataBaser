@@ -57,10 +57,15 @@ CREATE OR REPLACE TRIGGER Unregistered
 			WHERE studentId = :unreg.studentId
 			AND course = :unreg.course;
 
-			SELECT maxStudents INTO maxStudentsAllowed
-			FROM RestrictedCourses
-			WHERE course = :unreg.course;
+			BEGIN
+				SELECT maxStudents INTO maxStudentsAllowed
+				FROM RestrictedCourses
+				WHERE course = :unreg.course;
 
+				EXCEPTION
+					WHEN NO_DATA_FOUND THEN
+						maxStudentsAllowed := -1;
+			END;
 
 			IF (waitingStatus = 'Registered') THEN
 				DELETE FROM Registered
@@ -77,11 +82,20 @@ CREATE OR REPLACE TRIGGER Unregistered
 			FROM Registered
 			WHERE Registered.course = :unreg.course;
 
+			/* If we try to unregister someone from a course that is
+				not restricted we don't have a queue and thus, we won't
+				perform this since maxStudentsAllowed will be -1 */
 			IF (nrStudentsInClass < maxStudentsAllowed) THEN
-				SELECT NVL(studentId, '0') INTO firstPersonInQueue
-				FROM CourseQueuePositions
-				WHERE course = :unreg.course
+				BEGIN
+					SELECT studentId INTO firstPersonInQueue
+					FROM CourseQueuePositions
+					WHERE course = :unreg.course
 					AND position = 1;
+
+					EXCEPTION
+						WHEN NO_DATA_FOUND THEN
+							firstPersonInQueue := '0';
+				END;
 				IF (firstPersonInQueue != '0') THEN
 					INSERT INTO Registered
 					VALUES (firstPersonInQueue, :unreg.course);
@@ -92,8 +106,3 @@ CREATE OR REPLACE TRIGGER Unregistered
 				END IF;
 			END IF;
 		END;
-
-DELETE FROM Registrations
-WHERE course = 'RST000' AND studentId = '0000000002';
-
-select * from Registrations where course = 'RST000'
