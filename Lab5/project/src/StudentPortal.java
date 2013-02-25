@@ -26,7 +26,7 @@ public class StudentPortal
 		if (args.length == 1) {
 			try {
 				DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
-				String url = "XXXX";
+				String url = "XXXXX";
 				String userName = ""; // Your username goes here!
 				String password = ""; // Your password goes here!
 				Connection conn = DriverManager.getConnection(url,userName,password);
@@ -123,11 +123,15 @@ public class StudentPortal
 		// Print registered courses
 		System.out.println("Registered courses (code, credits: status):");
 		try {
-			ResultSet set = st.executeQuery("SELECT Q.course, credits, status, position " +
-											"FROM Registrations R, CourseQueuePositions Q, Courses " +
-											"WHERE R.studentId = " + student + 
-											"AND Q.studentId = R.studentId " +
-											"AND Q.course = R.course " +
+			ResultSet set = st.executeQuery("SELECT R.course, credits, status, NULL " +
+											"FROM Registrations R, Courses " +
+											"WHERE R.studentId = " + student + " " +
+											"AND Courses.code = R.course " +
+											"AND status = 'Registered'" + 
+											"UNION " + 
+											"SELECT Q.course, credits, 'Waiting', position " +
+											"FROM CourseQueuePositions Q, Courses " + 
+											"WHERE Q.studentId = " + student + " " +
 											"AND Courses.code = Q.course");
 			while (set.next()) {
 				System.out.print("\t" + set.getString(1) + ", " + set.getString(2) + ": ");
@@ -171,12 +175,12 @@ public class StudentPortal
 		}
 	
 		try {
-			int result = st.executeUpdate("INSERT INTO Registrations (studentId, course) " +
+			st.executeUpdate("INSERT INTO Registrations (studentId, course) " +
 											"VALUES ('" + student + "', '" + course + "')");
 			ResultSet set = st.executeQuery("SELECT status " +
 											"FROM Registrations " +
 											"WHERE studentId = " + student + " " + 
-											"AND course = " + course);
+											"AND course = '" + course + "'");
 			set.next();
 			if ("Registered".equals(set.getString(1))) {
 				System.out.println("You are now successfully registered to course " + course + "!");
