@@ -3,7 +3,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 // JDBC stuff.
 // Reading user input.
 
@@ -24,9 +26,9 @@ public class StudentPortal
 		if (args.length == 1) {
 			try {
 				DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
-				String url = "jdbc:oracle:thin:@tycho.ita.chalmers.se:1521/kingu.ita.chalmers.se";
-				String userName = "vtda357_035"; // Your username goes here!
-				String password = "padthai"; // Your password goes here!
+				String url = "XXXX";
+				String userName = ""; // Your username goes here!
+				String password = ""; // Your password goes here!
 				Connection conn = DriverManager.getConnection(url,userName,password);
 
 				String student = args[0]; // This is the identifier for the student.
@@ -74,12 +76,124 @@ public class StudentPortal
 
 	static void getInformation(Connection conn, String student)
 	{
-		// Your implementation here
+		// Create statement and exit if it fails
+		Statement st = null;
+		try {
+			st = conn.createStatement();
+		} catch (SQLException e) {
+			System.out.println("SQL ERROR: Failed to create statement! Exiting.");
+			System.exit(1);
+		}
+
+		// Print name, programme and branch
+		System.out.println("Information for student " + student);
+		System.out.println("-------------------------------------");
+		try {
+			ResultSet set = st.executeQuery("SELECT name, studyProgramme, branch " +
+					"FROM StudentsFollowing SF " +
+					"WHERE studentId = " + student + " ");
+			
+			set.next();
+			
+			System.out.println("Name: " + set.getString(1));
+			System.out.println("Line: " + set.getString(2));
+			System.out.println("Branch: " + set.getString(3));
+		} catch (SQLException e) {
+			System.out.println("SQL ERROR: " + e.getMessage());
+			return;
+		}
+		
+		// Print Read courses
+		System.out.println();
+		System.out.println("Read courses (code, credits: grade):");		
+		try {
+			ResultSet set = st.executeQuery("SELECT course, credits, grade " +
+											"FROM FinishedCourses " +
+											"WHERE studentId = " + student);
+			while (set.next()) {
+				System.out.print("\t" + set.getString(1) + ", ");
+				System.out.println(set.getString(2) + ": " + set.getString(3));
+			}
+			
+		} catch (SQLException e) {
+			System.out.println("SQL ERROR: " + e.getMessage());
+			return;
+		}
+		
+		// Print registered courses
+		System.out.println("Registered courses (code, credits: status):");
+		try {
+			ResultSet set = st.executeQuery("SELECT Q.course, credits, status, position " +
+											"FROM Registrations R, CourseQueuePositions Q, Courses " +
+											"WHERE R.studentId = " + student + 
+											"AND Q.studentId = R.studentId " +
+											"AND Q.course = R.course " +
+											"AND Courses.code = Q.course");
+			while (set.next()) {
+				System.out.print("\t" + set.getString(1) + ", " + set.getString(2) + ": ");
+				if ("Waiting".equals(set.getString(3))) {
+					System.out.println("waiting as nr " + set.getString(4));
+				} else {
+					System.out.println(set.getString(3));					
+				}
+			}
+			
+		} catch (SQLException e) {
+			System.out.println("SQL ERROR: " + e.getMessage());
+			return;
+		}
+		
+		try {
+			ResultSet set = st.executeQuery("SELECT seminarCourses, mathematicalCredits, reserachCredits, achievedCredits, qualifiedForGraduation " +
+											"FROM PathToGraduation " +
+											"WHERE studentId = " + student);
+			set.next();
+			
+			System.out.println("Seminar courses taken: " + set.getString(1));
+			System.out.println("Math credits taken: " + set.getString(2));
+			System.out.println("Research credits taken: " + set.getString(3));
+			System.out.println("Total credits taken: " + set.getString(4));
+			System.out.println("Fulfills graduation requirements: " + set.getString(5));
+		} catch (SQLException e) {
+			System.out.println("SQL ERROR: " + e.getMessage());
+			return;			
+		}
 	}
 
 	static void registerStudent(Connection conn, String student, String course)
 	{
-		// Your implementation here
+		Statement st = null;
+		try {
+			st = conn.createStatement();
+		} catch (SQLException e) {
+			System.out.println("SQL ERROR: Failed to create statement! Exiting.");
+			System.exit(1);
+		}
+	
+		try {
+			int result = st.executeUpdate("INSERT INTO Registrations (studentId, course) " +
+											"VALUES ('" + student + "', '" + course + "')");
+			ResultSet set = st.executeQuery("SELECT status " +
+											"FROM Registrations " +
+											"WHERE studentId = " + student + " " + 
+											"AND course = " + course);
+			set.next();
+			if ("Registered".equals(set.getString(1))) {
+				System.out.println("You are now successfully registered to course " + course + "!");
+			} else {
+				set = st.executeQuery("SELECT position " +
+										"FROM CourseQueuePositions " +
+										"WHERE studentId = " + student + " " +
+										"AND course = " + course);
+				set.next();
+				System.out.println("Course " + course + " is full, " +
+									"you are put in the waiting list as number " +
+									set.getString(1) + ".");
+			}
+		} catch (SQLException e) {
+			System.out.println("SQL ERROR: " + e.getMessage());
+			return;
+		}
 	}
 
 	static void unregisterStudent(Connection conn, String student, String course)
