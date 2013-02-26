@@ -1,0 +1,26 @@
+* List info for a student that fulfills the requirements for graduation. This is done to stress test your PathToGraduation view.
+Student 0000000004 information
+
+* List info for a student that does not fulfill the requirements for graduation.
+Student 0000000001 information
+
+* Register a student for an unrestricted course, and show that they end up registered.
+Student 0000000001 information, register URS000, information
+
+* Register the same student for the same course again, and show that the program doesn't crash, and that the student gets an error message.
+Student 0000000001 register URS000
+
+* Unregister the student from the course.
+Student 0000000001 unregister URS000, information
+
+* Unregister the student again from the same course and show that it doesn't crash your program.
+Student 0000000001 unregister URS000
+
+* Register a student for a course that they don't have the prerequisites for, and show that the registration doesn't go through.
+Student 0000000001 register TDA003
+
+* Unregister the student from a restricted course that they are registered to, and which has at least two students in the queue. Show that the first student from the queue ended up as registered.
+* Then re-register the unregistered student again, and show that they end up last in the queue.
+Unregister the student again. Show that the student was removed from the queue, that no student was registered on the course as a result of this, and that the queue otherwise stays as before.
+* Unregister the student yet again, even though they are not registered, and show that the registrations and course queue are unchanged.
+* Finally, unregister a student from an overfull course, i.e. one with more students registered than there are places on the course (you need to set this situation up in the database directly). Show that no student was moved from the queue to being registered as a result.
