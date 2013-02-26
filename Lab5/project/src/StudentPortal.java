@@ -26,9 +26,9 @@ public class StudentPortal
 		if (args.length == 1) {
 			try {
 				DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
-				String url = "jdbc:oracle:thin:@tycho.ita.chalmers.se:1521/kingu.ita.chalmers.se";
-				String userName = "vtda357_035"; // Your username goes here!
-				String password = "padthai"; // Your password goes here!
+				String url = "";
+				String userName = ""; // Your username goes here!
+				String password = ""; // Your password goes here!
 				Connection conn = DriverManager.getConnection(url,userName,password);
 
 				String student = args[0]; // This is the identifier for the student.
