@@ -26,7 +26,7 @@ public class StudentPortal
 		if (args.length == 1) {
 			try {
 				DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
-				String url = "XXXX";
+				String url = "XXX";
 				String userName = ""; // Your username goes here!
 				String password = ""; // Your password goes here!
 				Connection conn = DriverManager.getConnection(url,userName,password);
@@ -225,6 +225,20 @@ public class StudentPortal
 		Statement st = null;
 		try {
 			st = conn.createStatement();
+			ResultSet set = st.executeQuery("SELECT 1 " +
+											"FROM Registrations " +
+											"WHERE studentId = " + student + " " +
+											"AND course = '" + course + "'");
+			
+			if (!set.next()) {
+				System.out.println("Are you retarded? You're not even registered on that course!");
+				return;
+			}
+		} catch (SQLException e) {
+			System.out.println("SQL ERROR: " + e.getMessage());
+			return;			
+		}
+		try {
 			st.executeUpdate("DELETE FROM Registrations " +
 								"WHERE studentId = " + student + " " +
 								"AND course = '" + course + "'");

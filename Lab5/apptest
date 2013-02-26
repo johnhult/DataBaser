@@ -20,7 +20,21 @@ Student 0000000001 unregister URS000
 Student 0000000001 register TDA003
 
 * Unregister the student from a restricted course that they are registered to, and which has at least two students in the queue. Show that the first student from the queue ended up as registered.
+Student 0000000001 information, unregister from RST000
+Student 0000000003 information
+
 * Then re-register the unregistered student again, and show that they end up last in the queue.
+Student 0000000001 register RST000, information
+
 Unregister the student again. Show that the student was removed from the queue, that no student was registered on the course as a result of this, and that the queue otherwise stays as before.
+Student 0000000001 unregister RST000, information
+Student 0000000004 information
+
 * Unregister the student yet again, even though they are not registered, and show that the registrations and course queue are unchanged.
+Student 0000000001 unregister RST000, information
+Student 0000000004 information
+
 * Finally, unregister a student from an overfull course, i.e. one with more students registered than there are places on the course (you need to set this situation up in the database directly). Show that no student was moved from the queue to being registered as a result.
+Student 0000000001 register (in DB) RST000, unregister RST000, information
+Student 0000000004 information
+Student 0000000003 information
