@@ -7,10 +7,28 @@ CREATE OR REPLACE TRIGGER RegCourse
 			maxStudents INT;
 			registeredStudents INT;
 			isRegistered INT;
+			unPassedPreReqs INT;
 		BEGIN
-		/* Make sure a student can not register for a course höna is already
-		 * registered for.
-		 */
+			/*
+			 * Make sure a student has read all prerequisite courses
+			 */
+		 	BEGIN
+		 		SELECT NVL(COUNT(*), 0) INTO unPassedPreReqs
+		 		FROM Require R
+		 		WHERE :reg.course = R.course
+		 		AND (:reg.studentId, R.requiredCourse) NOT IN 
+			 		(SELECT studentId, course
+					FROM PassedCourses PC
+					WHERE :reg.studentId = PC.studentId);
+
+				EXCEPTION
+					WHEN NO_DATA_FOUND THEN
+						unPassedPreReqs := 0;
+		 	END;
+
+			/* Make sure a student can not register for a course höna is already
+			 * registered for.
+			 */
 			BEGIN 
 				SELECT 1 INTO isRegistered
 				FROM Registrations
@@ -49,8 +67,10 @@ CREATE OR REPLACE TRIGGER RegCourse
 						hasPassed := '0';
 			END;
 			
-			/* Only allow students to register for courses they have not passed */
-			IF (hasPassed = '0' AND isRegistered = 0) THEN
+			/* Only allow students to register for courses they have not passed 
+			 * As well as courses for which they have passed all pre-reqs
+			*/
+			IF (hasPassed = '0' AND isRegistered = 0 AND unPassedPreReqs = 0) THEN
 				/* maxStudents = -1 means we have an unrestricted course with unlimited seats */
 				IF (maxStudents <= registeredStudents AND maxStudents != -1) THEN
 					/* Put in waiting list */

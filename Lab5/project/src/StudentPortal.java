@@ -26,9 +26,9 @@ public class StudentPortal
 		if (args.length == 1) {
 			try {
 				DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
-				String url = "XXX";
-				String userName = ""; // Your username goes here!
-				String password = ""; // Your password goes here!
+				String url = "jdbc:oracle:thin:@tycho.ita.chalmers.se:1521/kingu.ita.chalmers.se";
+				String userName = "vtda357_035"; // Your username goes here!
+				String password = "padthai"; // Your password goes here!
 				Connection conn = DriverManager.getConnection(url,userName,password);
 
 				String student = args[0]; // This is the identifier for the student.
@@ -201,18 +201,28 @@ public class StudentPortal
 											"FROM Registrations " +
 											"WHERE studentId = " + student + " " + 
 											"AND course = '" + course + "'");
-			set.next();
-			if ("Registered".equals(set.getString(1))) {
-				System.out.println("You are now successfully registered to course " + course + "!");
+			
+			
+			
+			if (!set.next()) {
+				// Failed to register
+				System.out.println("Failed to register for course " + course + ", please make sure you have passed all prerequisite courses");
 			} else {
-				set = st.executeQuery("SELECT position " +
-										"FROM CourseQueuePositions " +
-										"WHERE studentId = " + student + " " +
-										"AND course = " + course);
-				set.next();
-				System.out.println("Course " + course + " is full, " +
-									"you are put in the waiting list as number " +
-									set.getString(1) + ".");
+				// Successful 
+				if ("Registered".equals(set.getString(1))) {
+					// .. registration
+					System.out.println("You are now successfully registered to course " + course + "!");
+				} else {
+					// .. queue
+					set = st.executeQuery("SELECT position " +
+							"FROM CourseQueuePositions " +
+							"WHERE studentId = " + student + " " +
+							"AND course = '" + course + "'");
+					set.next();
+					System.out.println("Course " + course + " is full, " +
+							"you are put in the waiting list as number " +
+							set.getString(1) + ".");
+				}				
 			}
 		} catch (SQLException e) {
 			System.out.println("SQL ERROR: " + e.getMessage());
