@@ -26,7 +26,7 @@ public class StudentPortal
 		if (args.length == 1) {
 			try {
 				DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
-				String url = "XXXXX";
+				String url = "XXXX";
 				String userName = ""; // Your username goes here!
 				String password = ""; // Your password goes here!
 				Connection conn = DriverManager.getConnection(url,userName,password);
@@ -172,6 +172,26 @@ public class StudentPortal
 		} catch (SQLException e) {
 			System.out.println("SQL ERROR: Failed to create statement! Exiting.");
 			System.exit(1);
+		}
+		
+		try {
+			ResultSet set = st.executeQuery("SELECT status " +
+											"FROM Registrations " +
+											"WHERE studentId = " + student + " " +
+											"AND course = '" + course + "'");
+			
+			if (set.next()) {
+				System.out.print("Sorry, but you are already ");
+				if ("Waiting".equals(set.getString(1))) {
+					System.out.println("waiting in line for " + course);
+				} else if ("Registered".equals(set.getString(1))) {
+					System.out.println("registered on " + course);
+				}
+				return;
+			}
+		} catch (SQLException e) {
+			System.out.println("SQL ERROR: " + e.getMessage());
+			return;			
 		}
 	
 		try {
