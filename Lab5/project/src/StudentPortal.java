@@ -26,9 +26,9 @@ public class StudentPortal
 		if (args.length == 1) {
 			try {
 				DriverManager.registerDriver(new oracle.jdbc.OracleDriver());
-				String url = "XXXXX";
-				String userName = ""; // Your username goes here!
-				String password = ""; // Your password goes here!
+				String url = "jdbc:oracle:thin:@tycho.ita.chalmers.se:1521/kingu.ita.chalmers.se";
+				String userName = "vtda357_035"; // Your username goes here!
+				String password = "padthai"; // Your password goes here!
 				Connection conn = DriverManager.getConnection(url,userName,password);
 
 				String student = args[0]; // This is the identifier for the student.
@@ -202,6 +202,16 @@ public class StudentPortal
 
 	static void unregisterStudent(Connection conn, String student, String course)
 	{
-		// Your implementation here
+		Statement st = null;
+		try {
+			st = conn.createStatement();
+			st.executeUpdate("DELETE FROM Registrations " +
+								"WHERE studentId = " + student + " " +
+								"AND course = '" + course + "'");
+			System.out.println("Unregistered from course: " + course + "!");
+		} catch (SQLException e) {
+			System.out.println("SQL ERROR: " + e.getMessage());
+			return;
+		}
 	}
 }
